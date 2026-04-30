@@ -7,9 +7,9 @@ nlp=spacy.load("en_core_web_sm")
 error=[]
 
 # Read contents from file in local folder - spaCy
-with open ("input/draft1.txt","r",encoding="utf-8") as file:
+with open ("input/input_file.txt","r",encoding="utf-8") as file:
     text=file.read()
-#print("Original text:\n",text)
+print("Original text:\n",text)
 
 # Convert content to Lowercase
 text=text.lower()
@@ -29,11 +29,11 @@ try:
     word=[] 
     lemmas=[] 
     for token in doc: 
-        if token.text.isalnum():
+        if token.text.isalpha():
             word.append(token.text) 
             lemmas.append(token.lemma_)
     #print("\nOriginal words and their lemmas:\n",list(zip(words,lemmas)))
-
+    
     # Remove Stopwords from content- NLP NLTK
     filtered_words=[]
     filtered_lemmas=[]
@@ -41,7 +41,7 @@ try:
         if not item.is_stop and item.text.isalnum(): #considers strings excluding stop words
             filtered_words.append(item.text)
             filtered_lemmas.append(item.lemma_)
-    #print("\nFiltered content:\n"," ".join(filtered_words))
+    print("\nFiltered content:\n"," ".join(filtered_words),"\n")
 
     #Measure Frequency of Filtered words- Pandas
     lemma_dict={} #create an empty dictionary
@@ -51,25 +51,45 @@ try:
             lemma_dict[lemma]=[term]
         else:
             lemma_dict[lemma].append(term)
+    total_analyzable_words=0
     for lemma in lemma_dict:
         variants=lemma_dict[lemma]
         frequency=len(variants)
         unique_variants=list(set(variants))
         dominant_variant=max(set(variants),key=variants.count)
         table.append([lemma,frequency,unique_variants,dominant_variant])
+        total_analyzable_words+=frequency
     sort_lemma=sorted(table,key=lambda l:l[1],reverse=True)
-    df=pd.DataFrame(sort_lemma,columns=["Lemma","Frequency","Unique Variants","Dominant Variant"])
-    df_filtered=df[df["Frequency"]>1].reset_index(drop=True)
+    df_filtered=pd.DataFrame(sort_lemma,columns=["Lemma","Frequency","Unique Variants","Dominant Variant"]).reset_index(drop=True)
     df_filtered.index=df_filtered.index+1
     print(df_filtered)
+    print("\nNumber of words to be analyzed:",total_analyzable_words)
     error.append(["Lemma","Success",""])
 except Exception as e:
     error.append(["Lemma","Failed",str(e)])
 
+#Review words which are not in standard English format
+d=enchant.Dict("en_GB")
+try:
+    review_dict={}
+    for word,lemma in zip(filtered_words,filtered_lemmas):
+        if not d.check(lemma.lower()):
+            review_dict[word.lower()]=review_dict.get(word.lower(),0)+1
+    sort_review=sorted(review_dict.items(),key=lambda r:r[1],reverse=True)
+    df_review=pd.DataFrame(sort_review,columns=["Non-Dictionary words","Frequency"])
+    df_review.index=df_review.index+1
+    print("\n",df_review)
+    total_review_words=sum(review_dict.values())
+    print("\nTotal number of words to review",total_review_words,"\n")
+    error.append(["Review Required","Success",""])
+except Exception as e:
+    error.append(["Review Required","Failed",str(e)])
+
 #Identify frequently used Phrases
 #Unigram
-#print("\nUnigram")
-#print("Number of filtered words:",len(filtered_words))
+print("\nUnigram")
+unigram_count=len(filtered_words)
+print("Number of filtered words:",unigram_count)
 try:
     unigram_dict={}
     for unigram in filtered_words:
@@ -83,14 +103,16 @@ try:
     df_ug_filtered=df_unigram[df_unigram["Frequency"]>1].reset_index(drop=True)
     df_ug_filtered.index=df_ug_filtered.index+1
     print(df_ug_filtered)
+    total_unigram_frequency=sum(v for v in unigram_dict.values() if v>1)
+    print("\nTotal repeated unigrams",total_unigram_frequency,"\n")
     error.append(["Unigram","Success",""])
 except Exception as e:
     error.append(["Unigram","Failed",str(e)])
 
 #Bigram
-#print("\nBigram")
-#print("Number of filtered words:",len(filtered_words))
-#print("Number of possible pairs:",len(filtered_words)-1)
+print("\nBigram")
+bigram_count=len(filtered_words)-1
+print("Number of pairs:",bigram_count)
 try:
     bigram=[] #create list of pairs
     for i in range(len(filtered_words)-1):
@@ -108,17 +130,19 @@ try:
     df_bg_filtered=df_bigram[df_bigram["Frequency"]>1].reset_index(drop=True)
     df_bg_filtered.index=df_bg_filtered.index+1
     print(df_bg_filtered)
+    total_bigram_frequency=sum(v for v in bigram_dict.values() if v>1)
+    print("\nTotal repeated bigrams",total_bigram_frequency,"\n")
     error.append(["Bigram","Success",""])
 except Exception as e:
     error.append(["Bigram","Failed",str(e)])
 
 #Trigram
 #print("\nTrigram")
-#print("Number of filtered words:",len(filtered_words))
-#print("Number of possible triplets:",len(filtered_words)-2)
+trigram_count=len(filtered_words)-2
+print("Number of triplets:",trigram_count)
 try:
     trigram=[] #create list of 3-words phrase
-    for i in range(len(filtered_words)-4):
+    for i in range(len(filtered_words)-2):
         triplet=filtered_words[i]+" "+filtered_words[i+1]+" "+filtered_words[i+2]
         trigram.append(triplet)
         unique_triplets=list(set(triplet))
@@ -133,24 +157,11 @@ try:
     df_tg_filtered=df_trigram[df_trigram["Frequency"]>1].reset_index(drop=True)
     df_tg_filtered.index=df_tg_filtered.index+1
     print(df_tg_filtered)
+    total_trigram_frequency=sum(v for v in trigram_dict.values() if v>1)
+    print("\nTotal repeated trigrams",total_trigram_frequency,"\n")
     error.append(["Trigram","Success",""])
 except Exception as e:
     error.append(["Trigram","Failed",str(e)])
-
-#Review words which are not in standard English format
-d=enchant.Dict("en_US")
-try:
-    review_dict={}
-    for word,lemma in zip(filtered_words,filtered_lemmas):
-        if not d.check(lemma.lower()):
-            review_dict[word.lower()]=review_dict.get(word.lower(),0)+1
-    sort_review=sorted(review_dict.items(),key=lambda r:r[1],reverse=True)
-    df_review=pd.DataFrame(sort_review,columns=["Non-Dictionary words","Frequency"])
-    df_review.index=df_review.index+1
-    print(df_review)
-    error.append(["Review Required","Success",""])
-except Exception as e:
-    error.append(["Review Required","Failed",str(e)])
 
 #Error Handling
 df_error=pd.DataFrame(error,columns=["Module Name","Status","Error Message"])
@@ -159,9 +170,9 @@ print(df_error)
 
 #Print output to Excel
 with pd.ExcelWriter("document_analysis.xlsx") as writer:
-    df_filtered.to_excel(writer,sheet_name="Lemma",index=False)
+    df_error.to_excel(writer,sheet_name="Error Handling",index=False) 
+    df_review.to_excel(writer,sheet_name="Review Required",index=False)
     df_ug_filtered.to_excel(writer,sheet_name="Unigram",index=False)
     df_bg_filtered.to_excel(writer,sheet_name="Bigram",index=False)
     df_tg_filtered.to_excel(writer,sheet_name="Trigram",index=False)
-    df_review.to_excel(writer,sheet_name="Review Required",index=False)
-    df_error.to_excel(writer,sheet_name="Error Handling",index=False)
+    df_filtered.to_excel(writer,sheet_name="Lemma",index=False)
