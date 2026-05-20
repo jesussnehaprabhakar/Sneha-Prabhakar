@@ -30,7 +30,7 @@ A[Input:.txt document]-->B[Python NLP Pipeline]-->C[Excel:document_analysis.xlsx
 - **Interactive** Power BI **dashboard**
 - Execution status/error **logging** 
 ## Project Structure 
-Sneha-Prabhakar-Portfolio/   
+NLP-based Document Quality Analyzer Pipeline/   
     ├── doc_quality_analyzer.py    
     ├── requirements.txt    
     ├── input_file.txt  
