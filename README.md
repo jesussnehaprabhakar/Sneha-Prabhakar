@@ -46,17 +46,16 @@ NLP-based Document Quality Analyzer Pipeline/
     1.2. Model Loading: Download the spaCy English NLP model using the command `py -m spacy download en_core_web_sm`
 2. Power BI (All Document Quality Score calculations and Interactive Report)  
 ## Skills demonstrated
-**Data Processing**: Python- Pandas, NLTK, NLP, spaCy, Enchant, Openpyxl  
-- Data **Normalization**: lowercasing, tokenization, stop-word filtering, punctuation removal, lemmatization   
-- Data Structuring: Load results to DataFrames  
-- Data Serialization: Export DataFrames to Excel for BI tools  
-- **ETL**: Extract from .txt - Transform with NLP - Load to Excel for Power BI
-
-**Data Analysis, BI & Visualization**: Power BI - **DAX**, **KPI** design, **Dashboarding**  
-**Agile**: **End-to-end SDLC** execution   
-**Software Design**: Modular **pipeline, Error handling, Logging**  
-**Testing & Validation**: Iterative testing on 50+ documents  
-**Business Analysis**: BRD/FRD/SRS/SOP domain knowledge, requirements quality
+- **Data Processing**: Python- Pandas, NLTK, NLP, spaCy, Enchant, Openpyxl  
+    - Data **Normalization**: lowercasing, tokenization, stop-word filtering, punctuation removal, lemmatization   
+    - Data Structuring: Load results to DataFrames  
+    - Data Serialization: Export DataFrames to Excel for BI tools  
+    - **ETL**: Extract from .txt - Transform with NLP - Load to Excel for Power BI
+- **Data Analysis, BI & Visualization**: Power BI - **DAX**, **KPI** design, **Dashboarding**  
+- **Agile**: **End-to-end SDLC** execution   
+- **Software Design**: Modular **pipeline, Error handling, Logging**  
+- **Testing & Validation**: Iterative testing on 50+ documents  
+- **Business Analysis**: BRD/FRD/SRS/SOP domain knowledge, requirements quality
 ## Execution
 1. Input: Copy the contents of your document into the file named `input_file.txt`
 2. Data Processing: Run `doc_quality_analyzer.py`
@@ -133,7 +132,7 @@ DQS=100-QDI
 Note 1: QDI(Quality_deviation_index) balances two equal factors: 50% weight on non-standard terminologies requiring review and 50% on phrase repetition density. This ensures the final DQS penalizes both unclear language and excessive repetition equally   
 Note 2: The above formulas Review_words_density, Unigram_density, Bigram_density, Trigram_density, Quality_deviation_index and Document_quality_score are percentage values (0-100 scale)
 ## Testing
-Tested using both AI generated synthetic documents and publicly available business analysis documents like BRDs, FRDs, SRS and SOPs  
+Tested 50+ AI generated synthetic documents and publicly available business analysis documents like BRDs, FRDs, SRS and SOPs  
 ## Usage
 Used by BAs and PMs to pre-check BRDs, FRDs, SRS, and SOPs before stakeholder review. Flags jargon and repetitive language to improve document quality and reduce review cycles.  
 ## Challenges
