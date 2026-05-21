@@ -159,5 +159,6 @@ Feel free to submit pull requests or open issues.
 ## License
 This project is licensed under the [MIT License](LICENSE)
 ## Contact
+Sneha Prabhakar
 Email: jesussnehaprabhakar@gmail.com  
 LinkedIn: www.linkedin.com/in/sneha-prabhakar-664821184  

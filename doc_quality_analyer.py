@@ -1,3 +1,6 @@
+""" Project: NLP-based Document Quality Analyzer Pipeline
+Author: Sneha Prabhakar
+Version 1.0"""
 import enchant
 import nltk
 import pandas as pd
